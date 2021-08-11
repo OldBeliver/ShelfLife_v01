@@ -12,8 +12,9 @@ namespace ShelfLife_v01
         {
             Creator creator = new Creator();
             List<Product> tinnedMeat = new List<Product>();
+            int productQuantity = 20;
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < productQuantity; i++)
             {
                 tinnedMeat.Add(creator.CreateNewTinnedMeat());
             }
