@@ -10,31 +10,40 @@ namespace ShelfLife_v01
     {
         static void Main(string[] args)
         {
-            /*
-            DateTime startDay = new DateTime(2018,06,01);
-            DateTime endDay = new DateTime(2021,08,10);
-            DateTime randomDay;
-            int easyday;
-            Random random = new Random();
+            Creator creator = new Creator();
+            List<Product> tinnedMeat = new List<Product>();
 
-            while (true)
+            for (int i = 0; i < 20; i++)
             {
-                easyday = (endDay - startDay).Days;
-
-                randomDay = startDay.AddDays(random.Next(easyday));
-
-                Console.WriteLine($"{randomDay.ToLongDateString()}");
-
-                Console.ReadKey();
+                tinnedMeat.Add(creator.CreateNewTinnedMeat());
             }
-            */
+
+            Console.WriteLine($"список продукции на складе, в ящиках");
+
+            for (int i = 0; i < tinnedMeat.Count; i++)
+            {
+                Console.Write($"{i+1:d2}. ");
+                tinnedMeat[i].ShowInfo();
+            }
+
+            Console.WriteLine($"\nНажмите, чтобы получить список просроченной продукции");
+            Console.ReadKey();
+
+            var FilteredOverdueDate = tinnedMeat.Where(product => product.ExpiryDay < DateTime.Today);
+
+            foreach (var product in FilteredOverdueDate)
+            {
+                product.ShowInfo();
+            }
         }
     }
 
     class Creator
     {
         private static Random _random;
-        private Product _product;
+        
+        private DateTime _firstDay;
+        private DateTime _lastDay;
 
         static Creator()
         {
@@ -43,12 +52,13 @@ namespace ShelfLife_v01
 
         public Creator()
         {
-           
+            _firstDay = new DateTime(2016, 06, 01);
+            _lastDay = new DateTime(2021, 08, 10);
         }
 
         public Product CreateNewTinnedMeat()
         {
-            return new Product();
+            return new Product(CreateTinnedMeatName(), CreateNewManufacturingDate(_firstDay, _lastDay), CreateNewLifeTimeInYears());
         }
 
         private string CreateTinnedMeatName()
@@ -70,9 +80,19 @@ namespace ShelfLife_v01
             return name;
         }
 
-        private DateTime CreateManufacturingDate()
+        private DateTime CreateNewManufacturingDate(DateTime _firstDay, DateTime _lastDay)
         {
-            DateTime firstDay = new DateTime(2018, 06, 01);
+            int period = (_lastDay - _firstDay).Days;
+
+            return _firstDay.AddDays(_random.Next(period));
+        }
+
+        private int CreateNewLifeTimeInYears()
+        {
+            int minLifeTime = 2;
+            int maxLifeTime = 6;
+
+            return _random.Next(minLifeTime, maxLifeTime + 1);
         }
     }
 
@@ -81,19 +101,19 @@ namespace ShelfLife_v01
         public string Name { get; private set; }
         public DateTime ManufacturingDate { get; private set; }
         public int LifeTimeInYears { get; private set; }
-        public DateTime LastDay { get; private set; }
+        public DateTime ExpiryDay { get; private set; }
 
         public Product(string name, DateTime manufacturingDate, int lifeTimeInYears)
         {
             Name = name;
             ManufacturingDate = manufacturingDate;
             LifeTimeInYears = lifeTimeInYears;
-            LastDay = ManufacturingDate.AddYears(LifeTimeInYears);
+            ExpiryDay = ManufacturingDate.AddYears(LifeTimeInYears);
         }
 
         public void ShowInfo()
         {
-            Console.WriteLine($"{Name} годна до {LastDay.ToString("dd.MM.yyyy")}");
+            Console.WriteLine($"{Name} годна до {ExpiryDay.ToString("dd.MM.yyyy")}");
         }
     }
 }
